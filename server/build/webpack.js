@@ -1,21 +1,21 @@
-import path, { sep } from "path";
-import webpack from "webpack";
-import resolve from "resolve";
-import UglifyJSPlugin from "uglifyjs-webpack-plugin";
-import CaseSensitivePathPlugin from "case-sensitive-paths-webpack-plugin";
-import WriteFilePlugin from "write-file-webpack-plugin";
-import FriendlyErrorsWebpackPlugin from "friendly-errors-webpack-plugin";
-import { getPages } from "./webpack/utils";
-import PagesPlugin from "./plugins/pages-plugin";
-import NextJsSsrImportPlugin from "./plugins/nextjs-ssr-import";
-import DynamicChunksPlugin from "./plugins/dynamic-chunks-plugin";
-import UnlinkFilePlugin from "./plugins/unlink-file-plugin";
-import findBabelConfig from "./babel/find-config";
+import path, { sep } from 'path';
+import webpack from 'webpack';
+import resolve from 'resolve';
+import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
+import CaseSensitivePathPlugin from 'case-sensitive-paths-webpack-plugin';
+import WriteFilePlugin from 'write-file-webpack-plugin';
+import FriendlyErrorsWebpackPlugin from 'friendly-errors-webpack-plugin';
+import { getPages } from './webpack/utils';
+import PagesPlugin from './plugins/pages-plugin';
+import NextJsSsrImportPlugin from './plugins/nextjs-ssr-import';
+import DynamicChunksPlugin from './plugins/dynamic-chunks-plugin';
+import UnlinkFilePlugin from './plugins/unlink-file-plugin';
+import findBabelConfig from './babel/find-config';
 
-const nextDir = path.join(__dirname, "..", "..", "..");
-const nextNodeModulesDir = path.join(nextDir, "node_modules");
-const nextPagesDir = path.join(nextDir, "pages");
-const defaultPages = ["_error.js", "_document.js"];
+const nextDir = path.join(__dirname, '..', '..', '..');
+const nextNodeModulesDir = path.join(nextDir, 'node_modules');
+const nextPagesDir = path.join(nextDir, 'pages');
+const defaultPages = ['_error.js', '_document.js'];
 const interpolateNames = new Map(
   defaultPages.map(p => {
     return [path.join(nextPagesDir, p), `dist/bundles/pages/${p}`];
@@ -27,7 +27,7 @@ function babelConfig(dir, { isServer, dev }) {
     cacheDirectory: true,
     presets: [],
     plugins: [
-      dev && !isServer && require.resolve("react-hot-loader/babel"),
+      dev && !isServer && require.resolve('react-hot-loader/babel'),
     ].filter(Boolean),
   };
 
@@ -49,7 +49,7 @@ function babelConfig(dir, { isServer, dev }) {
 
   // Add our default preset if the no "babelrc" found.
   if (!mainBabelOptions.babelrc) {
-    mainBabelOptions.presets.push(require.resolve("./babel/preset"));
+    mainBabelOptions.presets.push(require.resolve('./babel/preset'));
   }
 
   return mainBabelOptions;
@@ -88,7 +88,7 @@ function externalsConfig(dir, isServer) {
   return externals;
 }
 
-export default async function getBaseWebpackConfig(
+export default (async function getBaseWebpackConfig(
   dir,
   { dev = false, isServer = false, buildId, config }
 ) {
@@ -96,53 +96,53 @@ export default async function getBaseWebpackConfig(
 
   const defaultLoaders = {
     babel: {
-      loader: "babel-loader",
+      loader: 'babel-loader',
       options: babelLoaderOptions,
     },
   };
 
   // Support for NODE_PATH
-  const nodePathList = (process.env.NODE_PATH || "")
-    .split(process.platform === "win32" ? ";" : ":")
+  const nodePathList = (process.env.NODE_PATH || '')
+    .split(process.platform === 'win32' ? ';' : ':')
     .filter(p => !!p);
 
   let totalPages;
 
   let webpackConfig = {
-    devtool: dev ? "source-map" : false,
-    name: isServer ? "server" : "client",
+    devtool: dev ? 'source-map' : false,
+    name: isServer ? 'server' : 'client',
     cache: true,
-    target: isServer ? "node" : "web",
+    target: isServer ? 'node' : 'web',
     externals: externalsConfig(dir, isServer),
     context: dir,
     entry: async () => {
       const pages = await getPages(dir, {
         dev,
         isServer,
-        pageExtensions: config.pageExtensions.join("|"),
+        pageExtensions: config.pageExtensions.join('|'),
       });
       totalPages = Object.keys(pages).length;
-      const mainJS = require.resolve(`../../client/next${dev ? "-dev" : ""}`);
+      const mainJS = require.resolve(`../../client/next${dev ? '-dev' : ''}`);
       const clientConfig = !isServer
         ? {
-            "main.js": [
+            'main.js': [
               dev &&
                 !isServer &&
                 path.join(
                   __dirname,
-                  "..",
-                  "..",
-                  "client",
-                  "webpack-hot-middleware-client"
+                  '..',
+                  '..',
+                  'client',
+                  'webpack-hot-middleware-client'
                 ),
               dev &&
                 !isServer &&
                 path.join(
                   __dirname,
-                  "..",
-                  "..",
-                  "client",
-                  "on-demand-entries-client"
+                  '..',
+                  '..',
+                  'client',
+                  'on-demand-entries-client'
                 ),
               mainJS,
             ].filter(Boolean),
@@ -154,28 +154,28 @@ export default async function getBaseWebpackConfig(
       };
     },
     output: {
-      path: path.join(dir, config.distDir, isServer ? "dist" : ""), // server compilation goes to `.next/dist`
-      filename: "[name]",
-      libraryTarget: "commonjs2",
+      path: path.join(dir, config.distDir, isServer ? 'dist' : ''), // server compilation goes to `.next/dist`
+      filename: '[name]',
+      libraryTarget: 'commonjs2',
       // This saves chunks with the name given via require.ensure()
-      chunkFilename: "[name]-[chunkhash].js",
+      chunkFilename: '[name]-[chunkhash].js',
       strictModuleExceptionHandling: true,
       devtoolModuleFilenameTemplate(info) {
         if (dev) {
-          return "[absolute-resource-path]";
+          return '[absolute-resource-path]';
         }
 
         return `${info.absoluteResourcePath
-          .replace(dir, ".")
-          .replace(nextDir, "./node_modules/next")}`;
+          .replace(dir, '.')
+          .replace(nextDir, './node_modules/next')}`;
       },
     },
     performance: { hints: false },
     resolve: {
-      extensions: [".js", ".jsx", ".json"],
+      extensions: ['.js', '.jsx', '.json'],
       modules: [
         nextNodeModulesDir,
-        "node_modules",
+        'node_modules',
         ...nodePathList, // Support for NODE_PATH environment variable
       ],
       alias: {
@@ -188,18 +188,18 @@ export default async function getBaseWebpackConfig(
         // Here we are doing an exact match with '$'
         // So, you can still require nested modules like `react-dom/server`
         react$: dev
-          ? "react/cjs/react.development.js"
-          : "react/cjs/react.production.min.js",
-        "react-dom$": dev
-          ? "react-dom/cjs/react-dom.development.js"
-          : "react-dom/cjs/react-dom.production.min.js",
+          ? 'react/cjs/react.development.js'
+          : 'react/cjs/react.production.min.js',
+        'react-dom$': dev
+          ? 'react-dom/cjs/react-dom.development.js'
+          : 'react-dom/cjs/react-dom.production.min.js',
       },
     },
     resolveLoader: {
       modules: [
         nextNodeModulesDir,
-        "node_modules",
-        path.join(__dirname, "loaders"),
+        'node_modules',
+        path.join(__dirname, 'loaders'),
         ...nodePathList, // Support for NODE_PATH environment variable
       ],
     },
@@ -208,8 +208,8 @@ export default async function getBaseWebpackConfig(
         dev &&
           !isServer && {
             test: /\.(js|jsx)(\?[^?]*)?$/,
-            loader: "hot-self-accept-loader",
-            include: [path.join(dir, "pages"), nextPagesDir],
+            loader: 'hot-self-accept-loader',
+            include: [path.join(dir, 'pages'), nextPagesDir],
           },
         {
           test: /\.+(js|jsx)$/,
@@ -286,8 +286,8 @@ export default async function getBaseWebpackConfig(
           },
         }),
       new webpack.DefinePlugin({
-        "process.env.NODE_ENV": JSON.stringify(
-          dev ? "development" : "production"
+        'process.env.NODE_ENV': JSON.stringify(
+          dev ? 'development' : 'production'
         ),
       }),
       !dev && new webpack.optimize.ModuleConcatenationPlugin(),
@@ -298,8 +298,8 @@ export default async function getBaseWebpackConfig(
       // In production we move common modules into the existing main.js bundle
       !isServer &&
         new webpack.optimize.CommonsChunkPlugin({
-          name: "main.js",
-          filename: "main.js",
+          name: 'main.js',
+          filename: 'main.js',
           minChunks(module, count) {
             // React and React DOM are used everywhere in Next.js. So they should always be common. Even in development mode, to speed up compilation.
             if (
@@ -340,13 +340,13 @@ export default async function getBaseWebpackConfig(
       dev &&
         !isServer &&
         new webpack.optimize.CommonsChunkPlugin({
-          name: "manifest",
-          filename: "manifest.js",
+          name: 'manifest',
+          filename: 'manifest.js',
         }),
     ].filter(Boolean),
   };
 
-  if (typeof config.webpack === "function") {
+  if (typeof config.webpack === 'function') {
     webpackConfig = config.webpack(webpackConfig, {
       dir,
       dev,
@@ -359,4 +359,4 @@ export default async function getBaseWebpackConfig(
   }
 
   return webpackConfig;
-}
+});
