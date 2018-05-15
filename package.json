@@ -1,7 +1,8 @@
 {
   "name": "next",
   "version": "5.1.0",
-  "description": "Minimalistic framework for server-rendered React applications",
+  "description":
+    "Minimalistic framework for server-rendered React applications",
   "main": "./dist/server/next.js",
   "license": "MIT",
   "repository": "zeit/next.js",
@@ -32,24 +33,14 @@
     "pretestonly": "taskr pretest",
     "testonly": "cross-env NODE_PATH=test/lib jest \\.test.js",
     "posttestonly": "taskr posttest",
-    "testall": "npm run testonly -- --coverage --forceExit --runInBand --verbose --bail",
+    "testall":
+      "npm run testonly -- --coverage --forceExit --runInBand --verbose --bail",
     "pretest": "npm run lint",
     "test": "cross-env npm run testall || npm run testall",
-    "coveralls": "nyc --instrument=false --source-map=false report --temp-directory=./coverage --reporter=text-lcov | coveralls",
-    "lint": "standard 'bin/*' 'client/**/*.js' 'examples/**/*.js' 'lib/**/*.js' 'pages/**/*.js' 'server/**/*.js' 'test/**/*.js'",
-    "prepublish": "npm run release",
-    "precommit": "lint-staged"
-  },
-  "standard": {
-    "parser": "babel-eslint",
-    "ignore": [
-      "**/node_modules/**",
-      "**/examples/**/lib/**"
-    ]
-  },
-  "lint-staged": {
-    "*.js": "standard",
-    "bin/*": "standard"
+    "coveralls":
+      "nyc --instrument=false --source-map=false report --temp-directory=./coverage --reporter=text-lcov | coveralls",
+    "lint":
+      "standard 'bin/*' 'client/**/*.js' 'examples/**/*.js' 'lib/**/*.js' 'pages/**/*.js' 'server/**/*.js' 'test/**/*.js'"
   },
   "dependencies": {
     "@zeit/check-updates": "1.1.1",
@@ -149,8 +140,6 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "roots": [
-      "test/"
-    ]
+    "roots": ["test/"]
   }
 }
